@@ -1,13 +1,9 @@
-## Hangman Game
-
-Original code from [Brad Traversy](https://github.com/bradtraversy/vanillawebprojects/blob/master/hangman/). The original uses vanilla JavaScript. This has been convered into React.
-
 ## How To Play The Game
-
+Select a choice from drom down category 
+Hidden word will be related to the category
 Select a letter to figure out a hidden word in a set amount of chances
 
 ## Project Specifications
-
 - Display hangman pole and figure using SVG
 - Generate a random word
 - Display word in UI with correct letters
