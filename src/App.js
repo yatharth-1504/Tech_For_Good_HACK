@@ -1,108 +1,99 @@
-import React, { useState, useEffect } from 'react';
-import Header from './components/Header';
-import Figure from './components/Figure';
-import WrongLetters from './components/WrongLetters';
-import Word from './components/Word';
-import Popup from './components/Popup';
-import Notification from './components/Notification';
-import { showNotification as show, checkWin } from './helpers/helpers';
+import React, { useState, useEffect } from "react";
+import Header from "./components/Header";
+import Figure from "./components/Figure";
+import WrongLetters from "./components/WrongLetters";
+import Word from "./components/Word";
+import Popup from "./components/Popup";
+import Notification from "./components/Notification";
+import { showNotification as show, checkWin } from "./helpers/helpers";
 
-import './App.css';
+import "./App.css";
 
-const words = [
-  {
-    "countries": {
-      "name": [
-        "afghanistan",
-        "austrailia",
-        "brazil",
-        "canada",
-        "china",
-        "india"
-      ],
-      "clues": [
-        "Taliban",
-        "Country of beaches",
-        "Most FiFa Wins",
-        "Mini Punjab",
-        "The greatwall",
-        "Taj Mahal"
-      ]
-    }
+const categories = {
+  Countries: {
+    name: ["afghanistan", "austrailia", "brazil", "canada", "china", "india"],
+    clues: [
+      "Taliban",
+      "Country of beaches",
+      "Most FiFa Wins",
+      "Mini Punjab",
+      "The greatwall",
+      "Taj Mahal",
+    ],
   },
-  {
-    "fruits": {
-      "name": [
-        "apple",
-        "orange",
-        "banana",
-        "mangoe",
-        "grape"
-      ]
-    },
-    "clues": [
-      "keeps doctor away",
-      "Also a Colour",
-      "Minions",
-      "Yellow",
-      "Green"
-    ]
+  Fruits: {
+    name: ["apple", "orange", "banana", "mango", "grape"],
+    clues: ["Keeps doctor away", "Also a Colour", "Minions", "Yellow", "Green"],
   },
-  {
-    "animals": {
-      "name": [
-        "lion",
-        "penguin",
-        "pegion",
-        "elephant"
-      ],
-      "clues": [
-        "king",
-        "SnowBird",
-        "also a book publication",
-        "Rook (Chess Reference)"
-      ]
-    }
-  }
-]
-
-let nameIndex = Math.floor(Math.random() * words[0].countries.name.length);
-
+  Animals: {
+    name: ["lion", "penguin", "pegion", "elephant"],
+    clues: [
+      "King",
+      "Snowbird",
+      "Also a book publication",
+      "Rook (Chess Reference)",
+    ],
+  },
+  Geography: {
+    name: ["elevation", "mountains","india", "china", "the Rockies","plain", "young fold", "plateau", "range", "plain", "africa"],
+    clues: [
+      "The mountains differ from the hills in terms of",
+      "Glaciers are found in",
+      "The Deccan plateau islocated in",
+      "The river Yangtze flows in",
+      "An important mountain range of Europe is",
+      "A………… is an unbroken flat or a low-le of…………………… types of mountains",
+      "………  areas are rich in mineral deposits",
+      "The………… is a line of mountains",
+      "The ………..  areas are most producting for farming",
+      "Mt. Kilimanjaro is in",
+    ],
+  },
+};
 function App() {
-  const [Category, setCategory] = useState("");
-  const [nameIndex, setnameIndex] = useState("");
-
-  const [selectedWord, setselectedWord] = useState("");
   const [playable, setPlayable] = useState(true);
   const [correctLetters, setCorrectLetters] = useState([]);
   const [wrongLetters, setWrongLetters] = useState([]);
   const [showNotification, setShowNotification] = useState(false);
-
+  const [selectedCategory, setSelectedCategory] = useState(
+    Object.keys(categories)[0]
+  );
+  const [selectedWord, setSelectedWord] = useState("");
+  const [selectedClue, setSelectedClue] = useState("");
   useEffect(() => {
-    const handleKeydown = event => {
+    const handleKeydown = (event) => {
       const { key, keyCode } = event;
       if (playable && keyCode >= 65 && keyCode <= 90) {
         const letter = key.toLowerCase();
         if (selectedWord.includes(letter)) {
           if (!correctLetters.includes(letter)) {
-            setCorrectLetters(currentLetters => [...currentLetters, letter]);
+            setCorrectLetters((currentLetters) => [...currentLetters, letter]);
           } else {
             show(setShowNotification);
           }
         } else {
           if (!wrongLetters.includes(letter)) {
-            setWrongLetters(currentLetters => [...currentLetters, letter]);
+            setWrongLetters((currentLetters) => [...currentLetters, letter]);
           } else {
             show(setShowNotification);
           }
         }
       }
-    }
-    window.addEventListener('keydown', handleKeydown);
+    };
+    window.addEventListener("keydown", handleKeydown);
 
-    return () => window.removeEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener("keydown", handleKeydown);
   }, [correctLetters, wrongLetters, playable]);
-
+  useEffect(() => {
+    setPlayable(true);
+    setCorrectLetters([]);
+    setWrongLetters([]);
+    const index = Math.floor(
+      Math.random() * categories[selectedCategory].name.length
+    );
+    setSelectedWord(categories[selectedCategory].name[index]);
+    setSelectedClue(categories[selectedCategory].clues[index]);
+  }, [selectedCategory]);
   function playAgain() {
     setPlayable(true);
 
@@ -110,44 +101,44 @@ function App() {
     setCorrectLetters([]);
     setWrongLetters([]);
 
-    const random = Math.floor(Math.random() * words.length);
-    setselectedWord(words[random]);
+    const index = Math.floor(
+      Math.random() * categories[selectedCategory].name.length
+    );
+    setSelectedWord(categories[selectedCategory].name[index]);
+    setSelectedClue(categories[selectedCategory].clues[index]);
   }
-  useEffect(() => {
-    if (Category !== "") {
-      setnameIndex(Math.floor(Math.random() * words[0].countries.name.length));
-      setselectedWord(words[0][Category].name[nameIndex]);
-    }
-
-  }, [Category]);
 
   return (
     <>
       <Header />
       <div className="box">
-        <form>
-          <label>
-            Select a Category:
-            <select className="custom" onChange={(e) => {
-              const selectedFood = e.target.value;
-              setCategory(selectedFood)
-            }}>
-              <option value="Select">Select</option>
-              <option value="countries">countries</option>
-              <option value="fruits">fruits</option>
-              <option value="animals">animals</option>
-            </select>
-            {Category} {selectedWord}
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
+        <label>
+          Select a Category:
+          <select
+            className="custom"
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+            }}
+          >
+            {Object.keys(categories).map((category) => {
+              return <option value={category}>{category}</option>;
+            })}
+          </select>
+          <label>Clue : {selectedClue}</label>
+        </label>
       </div>
       <div className="game-container">
         <Figure wrongLetters={wrongLetters} />
         <WrongLetters wrongLetters={wrongLetters} />
         <Word selectedWord={selectedWord} correctLetters={correctLetters} />
       </div>
-      <Popup correctLetters={correctLetters} wrongLetters={wrongLetters} selectedWord={selectedWord} setPlayable={setPlayable} playAgain={playAgain} />
+      <Popup
+        correctLetters={correctLetters}
+        wrongLetters={wrongLetters}
+        selectedWord={selectedWord}
+        setPlayable={setPlayable}
+        playAgain={playAgain}
+      />
       <Notification showNotification={showNotification} />
     </>
   );
